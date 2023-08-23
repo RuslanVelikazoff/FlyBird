@@ -8,8 +8,23 @@ public class Spawner : MonoBehaviour
 
     public GameObject pipePrefab;
 
+    private StartData data;
+
     public void Initialize()
     {
+        data = FindObjectOfType<StartData>();
+        if (data.easyLevel)
+        {
+            timeToSpawn = 5;
+        }
+        if (data.midleLevel)
+        {
+            timeToSpawn = 3;
+        }
+        if (data.hardLevel)
+        {
+            timeToSpawn = 2;
+        }
         timer = timeToSpawn;
 
         Debug.Log("Spawner initialized");

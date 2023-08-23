@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("PipePart"))
         {
             Debug.Log("You lose!");
+            FindObjectOfType<AudioManager>().Play("Lose");
             levelUIManager.LoseGame();
         }
     }
@@ -47,6 +48,7 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("AddScore"))
         {
             scoreManager.AddScore();
+            FindObjectOfType<AudioManager>().Play("AddScore");
         }
     }
 }
