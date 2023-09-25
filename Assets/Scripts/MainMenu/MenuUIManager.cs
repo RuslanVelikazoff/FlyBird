@@ -8,13 +8,10 @@ public class MenuUIManager : MonoBehaviour
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private Button playButton;
     [SerializeField] private Button settingsButton;
-    [SerializeField] private Button exitButton;
     [SerializeField] private Text scoreText;
 
     [Header("SettingsPanel")]
     [SerializeField] private GameObject settingsPanel;
-    [SerializeField] private Slider volumeSlider;
-    [SerializeField] private Slider musicSlider;
     [SerializeField] private Button easyLevelButton;
     [SerializeField] private Text easyLevelText;
     [SerializeField] private Button midleLevelButton;
@@ -22,6 +19,14 @@ public class MenuUIManager : MonoBehaviour
     [SerializeField] private Button hardLevelButton;
     [SerializeField] private Text hardLevelText;
     [SerializeField] private Button backMenuButton;
+
+    [SerializeField] private Button musicButton;
+    [SerializeField] private Sprite musicOnSprite;
+    [SerializeField] private Sprite musicOffSprite;
+
+    [SerializeField] private Button soundButton;
+    [SerializeField] private Sprite soundOnSprite;
+    [SerializeField] private Sprite soundOffSprite;
 
     private MenuData data;
 
@@ -31,15 +36,11 @@ public class MenuUIManager : MonoBehaviour
 
         ButtonFunc();
         SetDifficulty();
-        SetVolumeSlider();
+        SetSoundSprite();
+        SetMusicSprite();
         ScoreInitialize();
 
         Debug.Log("Menu UI initialized");
-    }
-
-    private void Update()
-    {
-        UpdateVolumeSlider();
     }
 
     private void ButtonFunc()
@@ -63,15 +64,6 @@ public class MenuUIManager : MonoBehaviour
                 Debug.Log("Settings button");
             });
         }
-        if (exitButton != null)
-        {
-            exitButton.onClick.RemoveAllListeners();
-            exitButton.onClick.AddListener(() =>
-            {
-                Application.Quit();
-                Debug.Log("Quit");
-            });
-        }
         #endregion
         #region SettingsPanel
         if (backMenuButton != null)
@@ -81,6 +73,42 @@ public class MenuUIManager : MonoBehaviour
             {
                 mainPanel.SetActive(true);
                 settingsPanel.SetActive(false);
+            });
+        }
+
+        if (musicButton != null)
+        {
+            musicButton.onClick.RemoveAllListeners();
+            musicButton.onClick.AddListener(() =>
+            {
+                if (PlayerPrefs.GetFloat("MusicVolume") == 0)
+                {
+                    AudioManager.Instance.OnMusic();
+                    SetMusicSprite();
+                }
+                else
+                {
+                    AudioManager.Instance.OffMusic();
+                    SetMusicSprite();
+                }
+            });
+        }
+
+        if (soundButton != null)
+        {
+            soundButton.onClick.RemoveAllListeners();
+            soundButton.onClick.AddListener(() =>
+            {
+                if (PlayerPrefs.GetFloat("SoundVolume") == 0)
+                {
+                    AudioManager.Instance.OnSound();
+                    SetSoundSprite();
+                }
+                else
+                {
+                    AudioManager.Instance.OffSound();
+                    SetSoundSprite();
+                }
             });
         }
 
@@ -122,28 +150,29 @@ public class MenuUIManager : MonoBehaviour
             });
         }
         #endregion
-
     }
 
-    private void SetVolumeSlider()
+    private void SetMusicSprite()
     {
-        volumeSlider.value = PlayerPrefs.GetFloat("Volume");
-        musicSlider.value = PlayerPrefs.GetFloat("MusicVolume");
-    }
-
-    private void UpdateVolumeSlider()
-    {
-        PlayerPrefs.SetFloat("Volume", volumeSlider.value);
-        PlayerPrefs.SetFloat("MusicVolume", musicSlider.value);
-
-        foreach (var s in AudioManager.Instance.sounds)
+        if (PlayerPrefs.GetFloat("MusicVolume") == 0)
         {
-            s.source.volume = s.volume = PlayerPrefs.GetFloat("Volume");
+            musicButton.GetComponent<Image>().sprite = musicOffSprite;
+        }
+        else
+        {
+            musicButton.GetComponent<Image>().sprite = musicOnSprite;
+        }
+    }
 
-            if (s.name == "Music")
-            {
-                s.source.volume = s.volume = PlayerPrefs.GetFloat("MusicVolume");
-            }
+    private void SetSoundSprite()
+    {
+        if (PlayerPrefs.GetFloat("SoundVolume") == 0)
+        {
+            soundButton.GetComponent<Image>().sprite = soundOffSprite;
+        }
+        else
+        {
+            soundButton.GetComponent<Image>().sprite = soundOnSprite;
         }
     }
 
@@ -182,6 +211,6 @@ public class MenuUIManager : MonoBehaviour
 
     private void ScoreInitialize()
     {
-        scoreText.text = "Scores: " + data.highScore;
+        scoreText.text = "High score: " + data.highScore;
     }
 }
